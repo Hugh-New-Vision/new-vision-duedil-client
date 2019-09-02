@@ -1,0 +1,1643 @@
+<?php
+/**
+ * SearchApi
+ * PHP version 5
+ *
+ * @category Class
+ * @package  Swagger\Client
+ * @author   Swagger Codegen team
+ * @link     https://github.com/swagger-api/swagger-codegen
+ */
+
+/**
+ * DueDil API v4
+ *
+ * Welcome to the DueDil API v4, which provides programmatic access to DueDil's comprehensive company data. It can be used to enhance a wide variety of business functions, from auto-populating website forms to verifying customer credentials.  ### Getting started In order to make requests, you'll need to obtain an API key. Please visit https://www.duedil.com/api for more information. Once you have an API key, requests can be made using a UI such as [Postman](https://www.getpostman.com/) or via a terminal using [curl](https://curl.haxx.se/docs/manual.html). An example curl request should look as follows:  ``` curl -X GET --header 'Accept: application/json' --header 'X-AUTH-TOKEN: api_key' 'https://duedil.io/v4/company/gb/06999618.json' ```  ### Generating clients  This API has been authored using the [OpenAPI](https://en.wikipedia.org/wiki/OpenAPI_Specification) (Swagger) specification. Being machine readable, it can be used to generate V4 API clients in a range of languages. To create a client:   * Open the [Swagger Editor](http://editor.swagger.io/).  * Select 'File', 'Import URL' then enter https://duedil.io/v4/swagger.json  * Select 'Generate Client' then choose from over 30 languages such as PHP, Python and Java.  ### International data  DueDil provides a wide range of data spanning across multiple geographic regions. Our international package currently includes company information from the following countries:  | Country              |    | Country       |    | |----------------------|----|---------------|----| | Albania              | AL | Jersey        | JE | | Bahamas              | BS | Latvia        | LV | | Belgium              | BE | Liechtenstein | LI | | Bermuda              | BM | Luxembourg    | LU | | Hong Kong, SAR China | HK | Malta         | MT | | Cyprus               | CY | Montenegro    | ME | | Denmark              | DK | Netherlands   | NL | | Finland              | FI | Norway        | NO | | France               | FR | Poland        | PL | | Germany              | DE | Romania       | RO | | Greenland            | GL | Slovakia      | SK | | Guernsey             | GG | Slovenia      | SI | | Iceland              | IS | Sweden        | SE | | Isle of Man          | IM | Switzerland   | CH | | Israel               | IL |               |    |  Retrieving international data is simple. Construct your request with the corresponding country code. For the German company [Daimler AG](https://www.duedil.com/company/de/Stuttgart%20HRB%2019360/daimler-ag) you should construct your request URI as follows:  ``` curl -X GET --header 'Accept: application/json' --header 'X-AUTH-TOKEN: api_key' 'https://duedil.io/v4/company/de/Stuttgart%20HRB%2019360.json' ```  For Companies search, the country code should be included in the post body:  ``` {     \"criteria\": {         \"name\": \"Daimler AG\",         \"countryCodes\": {             \"values\": [\"DE\", \"FR\"]         }     } } ```  **Note:** You will need to have international access added to your plan to search for and retrieve information for companies outside of the United Kingdom (GB) and Ireland (IE).  #### Data coverage  While 100% coverage is our goal, this is not feasible for every international country at present. If we cannot find the entity you are requesting, the API will return HTTP 404 with message “Resource not found”. Partial responses can include null fields where specific data is unavailable.  ### Pagination  All endpoints that return collections can be paginated in the same way through two optional parameters (`limit` and `offset`). The `offset` parameter determines the 0-based index of the first element of the collection to be returned, which defaults to 0. The `limit` parameter sets the maximum number of items from the collection to be returned, which defaults to 10. The maximum allowed limit parameter is 50.  **Note:** API keys issued for evaluation purposes will have limited access to the first 10 search results only. Other non-search endpoints do not apply this constraint.   Every response from a paginated endpoint contains a top-level property called `pagination`, which in turn contains the `offset` and `limit` values used in the API call, as well as the `total` number of items in the collection. For instance:   ``` \"pagination\": {   \"offset\": 0,   \"limit\": 10,   \"total\": 12 } ```   In the example above, an API call with `offset` = 10 and `limit` = 10 would return the 11th and 12th items in the collection, whereas an API call with `offset` = 20 and `limit` = 10 would return a successful response (200 HTTP code) with an empty collection. Calls with invalid `offset`/`limit` parameters, such as negative values, return an error (400 HTTP code).
+ *
+ * OpenAPI spec version: 4.5.6
+ * 
+ * Generated by: https://github.com/swagger-api/swagger-codegen.git
+ * Swagger Codegen version: 2.4.8
+ */
+
+/**
+ * NOTE: This class is auto generated by the swagger code generator program.
+ * https://github.com/swagger-api/swagger-codegen
+ * Do not edit the class manually.
+ */
+
+namespace Swagger\Client\Api;
+
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
+use Swagger\Client\ApiException;
+use Swagger\Client\Configuration;
+use Swagger\Client\HeaderSelector;
+use Swagger\Client\ObjectSerializer;
+
+/**
+ * SearchApi Class Doc Comment
+ *
+ * @category Class
+ * @package  Swagger\Client
+ * @author   Swagger Codegen team
+ * @link     https://github.com/swagger-api/swagger-codegen
+ */
+class SearchApi
+{
+    /**
+     * @var ClientInterface
+     */
+    protected $client;
+
+    /**
+     * @var Configuration
+     */
+    protected $config;
+
+    /**
+     * @var HeaderSelector
+     */
+    protected $headerSelector;
+
+    /**
+     * @param ClientInterface $client
+     * @param Configuration   $config
+     * @param HeaderSelector  $selector
+     */
+    public function __construct(
+        ClientInterface $client = null,
+        Configuration $config = null,
+        HeaderSelector $selector = null
+    ) {
+        $this->client = $client ?: new Client();
+        $this->config = $config ?: new Configuration();
+        $this->headerSelector = $selector ?: new HeaderSelector();
+    }
+
+    /**
+     * @return Configuration
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Operation searchCharitiesFormatPost
+     *
+     * Find charities
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CharitySearchCriteria $body Charity search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharitySearchResponse
+     */
+    public function searchCharitiesFormatPost($format, $body, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->searchCharitiesFormatPostWithHttpInfo($format, $body, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation searchCharitiesFormatPostWithHttpInfo
+     *
+     * Find charities
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CharitySearchCriteria $body Charity search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharitySearchResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function searchCharitiesFormatPostWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharitySearchResponse';
+        $request = $this->searchCharitiesFormatPostRequest($format, $body, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharitySearchResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation searchCharitiesFormatPostAsync
+     *
+     * Find charities
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CharitySearchCriteria $body Charity search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchCharitiesFormatPostAsync($format, $body, $offset = '0', $limit = '10')
+    {
+        return $this->searchCharitiesFormatPostAsyncWithHttpInfo($format, $body, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation searchCharitiesFormatPostAsyncWithHttpInfo
+     *
+     * Find charities
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CharitySearchCriteria $body Charity search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchCharitiesFormatPostAsyncWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharitySearchResponse';
+        $request = $this->searchCharitiesFormatPostRequest($format, $body, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'searchCharitiesFormatPost'
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CharitySearchCriteria $body Charity search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function searchCharitiesFormatPostRequest($format, $body, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling searchCharitiesFormatPost'
+            );
+        }
+        // verify the required parameter 'body' is set
+        if ($body === null || (is_array($body) && count($body) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $body when calling searchCharitiesFormatPost'
+            );
+        }
+
+        $resourcePath = '/search/charities.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+        if (isset($body)) {
+            $_tempBody = $body;
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation searchCompaniesFormatPost
+     *
+     * Find companies
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CompanySearchCriteria $body Company search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanySearchResponse
+     */
+    public function searchCompaniesFormatPost($format, $body, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->searchCompaniesFormatPostWithHttpInfo($format, $body, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation searchCompaniesFormatPostWithHttpInfo
+     *
+     * Find companies
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CompanySearchCriteria $body Company search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanySearchResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function searchCompaniesFormatPostWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanySearchResponse';
+        $request = $this->searchCompaniesFormatPostRequest($format, $body, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanySearchResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation searchCompaniesFormatPostAsync
+     *
+     * Find companies
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CompanySearchCriteria $body Company search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchCompaniesFormatPostAsync($format, $body, $offset = '0', $limit = '10')
+    {
+        return $this->searchCompaniesFormatPostAsyncWithHttpInfo($format, $body, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation searchCompaniesFormatPostAsyncWithHttpInfo
+     *
+     * Find companies
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CompanySearchCriteria $body Company search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchCompaniesFormatPostAsyncWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanySearchResponse';
+        $request = $this->searchCompaniesFormatPostRequest($format, $body, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'searchCompaniesFormatPost'
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\CompanySearchCriteria $body Company search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function searchCompaniesFormatPostRequest($format, $body, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling searchCompaniesFormatPost'
+            );
+        }
+        // verify the required parameter 'body' is set
+        if ($body === null || (is_array($body) && count($body) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $body when calling searchCompaniesFormatPost'
+            );
+        }
+
+        $resourcePath = '/search/companies.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+        if (isset($body)) {
+            $_tempBody = $body;
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation searchKeywordsFormatPost
+     *
+     * Find keywords (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\KeywordSearchCriteria $body Keyword search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\KeywordSearchResponse
+     */
+    public function searchKeywordsFormatPost($format, $body, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->searchKeywordsFormatPostWithHttpInfo($format, $body, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation searchKeywordsFormatPostWithHttpInfo
+     *
+     * Find keywords (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\KeywordSearchCriteria $body Keyword search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\KeywordSearchResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function searchKeywordsFormatPostWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\KeywordSearchResponse';
+        $request = $this->searchKeywordsFormatPostRequest($format, $body, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\KeywordSearchResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation searchKeywordsFormatPostAsync
+     *
+     * Find keywords (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\KeywordSearchCriteria $body Keyword search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchKeywordsFormatPostAsync($format, $body, $offset = '0', $limit = '10')
+    {
+        return $this->searchKeywordsFormatPostAsyncWithHttpInfo($format, $body, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation searchKeywordsFormatPostAsyncWithHttpInfo
+     *
+     * Find keywords (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\KeywordSearchCriteria $body Keyword search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchKeywordsFormatPostAsyncWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\KeywordSearchResponse';
+        $request = $this->searchKeywordsFormatPostRequest($format, $body, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'searchKeywordsFormatPost'
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\KeywordSearchCriteria $body Keyword search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function searchKeywordsFormatPostRequest($format, $body, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling searchKeywordsFormatPost'
+            );
+        }
+        // verify the required parameter 'body' is set
+        if ($body === null || (is_array($body) && count($body) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $body when calling searchKeywordsFormatPost'
+            );
+        }
+
+        $resourcePath = '/search/keywords.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+        if (isset($body)) {
+            $_tempBody = $body;
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation searchOfficersFormatPost
+     *
+     * Find officers
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\OfficerSearchCriteria $body Officer search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\OfficerSearchResponse
+     */
+    public function searchOfficersFormatPost($format, $body, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->searchOfficersFormatPostWithHttpInfo($format, $body, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation searchOfficersFormatPostWithHttpInfo
+     *
+     * Find officers
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\OfficerSearchCriteria $body Officer search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\OfficerSearchResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function searchOfficersFormatPostWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\OfficerSearchResponse';
+        $request = $this->searchOfficersFormatPostRequest($format, $body, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\OfficerSearchResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation searchOfficersFormatPostAsync
+     *
+     * Find officers
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\OfficerSearchCriteria $body Officer search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchOfficersFormatPostAsync($format, $body, $offset = '0', $limit = '10')
+    {
+        return $this->searchOfficersFormatPostAsyncWithHttpInfo($format, $body, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation searchOfficersFormatPostAsyncWithHttpInfo
+     *
+     * Find officers
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\OfficerSearchCriteria $body Officer search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchOfficersFormatPostAsyncWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\OfficerSearchResponse';
+        $request = $this->searchOfficersFormatPostRequest($format, $body, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'searchOfficersFormatPost'
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\OfficerSearchCriteria $body Officer search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function searchOfficersFormatPostRequest($format, $body, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling searchOfficersFormatPost'
+            );
+        }
+        // verify the required parameter 'body' is set
+        if ($body === null || (is_array($body) && count($body) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $body when calling searchOfficersFormatPost'
+            );
+        }
+
+        $resourcePath = '/search/officers.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+        if (isset($body)) {
+            $_tempBody = $body;
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation searchRegionsFormatPost
+     *
+     * Find regions (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\RegionSearchCriteria $body Region search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\RegionSearchResponse
+     */
+    public function searchRegionsFormatPost($format, $body, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->searchRegionsFormatPostWithHttpInfo($format, $body, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation searchRegionsFormatPostWithHttpInfo
+     *
+     * Find regions (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\RegionSearchCriteria $body Region search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\RegionSearchResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function searchRegionsFormatPostWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\RegionSearchResponse';
+        $request = $this->searchRegionsFormatPostRequest($format, $body, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\RegionSearchResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation searchRegionsFormatPostAsync
+     *
+     * Find regions (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\RegionSearchCriteria $body Region search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchRegionsFormatPostAsync($format, $body, $offset = '0', $limit = '10')
+    {
+        return $this->searchRegionsFormatPostAsyncWithHttpInfo($format, $body, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation searchRegionsFormatPostAsyncWithHttpInfo
+     *
+     * Find regions (to be used on company/officer search filters)
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\RegionSearchCriteria $body Region search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function searchRegionsFormatPostAsyncWithHttpInfo($format, $body, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\RegionSearchResponse';
+        $request = $this->searchRegionsFormatPostRequest($format, $body, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'searchRegionsFormatPost'
+     *
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  \Swagger\Client\Model\RegionSearchCriteria $body Region search criteria (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function searchRegionsFormatPostRequest($format, $body, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling searchRegionsFormatPost'
+            );
+        }
+        // verify the required parameter 'body' is set
+        if ($body === null || (is_array($body) && count($body) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $body when calling searchRegionsFormatPost'
+            );
+        }
+
+        $resourcePath = '/search/regions.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+        if (isset($body)) {
+            $_tempBody = $body;
+        }
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'POST',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Create http client option
+     *
+     * @throws \RuntimeException on file opening failure
+     * @return array of http client options
+     */
+    protected function createHttpClientOption()
+    {
+        $options = [];
+        if ($this->config->getDebug()) {
+            $options[RequestOptions::DEBUG] = fopen($this->config->getDebugFile(), 'a');
+            if (!$options[RequestOptions::DEBUG]) {
+                throw new \RuntimeException('Failed to open the debug file: ' . $this->config->getDebugFile());
+            }
+        }
+
+        return $options;
+    }
+}

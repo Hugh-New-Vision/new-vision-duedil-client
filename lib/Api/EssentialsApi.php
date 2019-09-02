@@ -1,0 +1,7039 @@
+<?php
+/**
+ * EssentialsApi
+ * PHP version 5
+ *
+ * @category Class
+ * @package  Swagger\Client
+ * @author   Swagger Codegen team
+ * @link     https://github.com/swagger-api/swagger-codegen
+ */
+
+/**
+ * DueDil API v4
+ *
+ * Welcome to the DueDil API v4, which provides programmatic access to DueDil's comprehensive company data. It can be used to enhance a wide variety of business functions, from auto-populating website forms to verifying customer credentials.  ### Getting started In order to make requests, you'll need to obtain an API key. Please visit https://www.duedil.com/api for more information. Once you have an API key, requests can be made using a UI such as [Postman](https://www.getpostman.com/) or via a terminal using [curl](https://curl.haxx.se/docs/manual.html). An example curl request should look as follows:  ``` curl -X GET --header 'Accept: application/json' --header 'X-AUTH-TOKEN: api_key' 'https://duedil.io/v4/company/gb/06999618.json' ```  ### Generating clients  This API has been authored using the [OpenAPI](https://en.wikipedia.org/wiki/OpenAPI_Specification) (Swagger) specification. Being machine readable, it can be used to generate V4 API clients in a range of languages. To create a client:   * Open the [Swagger Editor](http://editor.swagger.io/).  * Select 'File', 'Import URL' then enter https://duedil.io/v4/swagger.json  * Select 'Generate Client' then choose from over 30 languages such as PHP, Python and Java.  ### International data  DueDil provides a wide range of data spanning across multiple geographic regions. Our international package currently includes company information from the following countries:  | Country              |    | Country       |    | |----------------------|----|---------------|----| | Albania              | AL | Jersey        | JE | | Bahamas              | BS | Latvia        | LV | | Belgium              | BE | Liechtenstein | LI | | Bermuda              | BM | Luxembourg    | LU | | Hong Kong, SAR China | HK | Malta         | MT | | Cyprus               | CY | Montenegro    | ME | | Denmark              | DK | Netherlands   | NL | | Finland              | FI | Norway        | NO | | France               | FR | Poland        | PL | | Germany              | DE | Romania       | RO | | Greenland            | GL | Slovakia      | SK | | Guernsey             | GG | Slovenia      | SI | | Iceland              | IS | Sweden        | SE | | Isle of Man          | IM | Switzerland   | CH | | Israel               | IL |               |    |  Retrieving international data is simple. Construct your request with the corresponding country code. For the German company [Daimler AG](https://www.duedil.com/company/de/Stuttgart%20HRB%2019360/daimler-ag) you should construct your request URI as follows:  ``` curl -X GET --header 'Accept: application/json' --header 'X-AUTH-TOKEN: api_key' 'https://duedil.io/v4/company/de/Stuttgart%20HRB%2019360.json' ```  For Companies search, the country code should be included in the post body:  ``` {     \"criteria\": {         \"name\": \"Daimler AG\",         \"countryCodes\": {             \"values\": [\"DE\", \"FR\"]         }     } } ```  **Note:** You will need to have international access added to your plan to search for and retrieve information for companies outside of the United Kingdom (GB) and Ireland (IE).  #### Data coverage  While 100% coverage is our goal, this is not feasible for every international country at present. If we cannot find the entity you are requesting, the API will return HTTP 404 with message “Resource not found”. Partial responses can include null fields where specific data is unavailable.  ### Pagination  All endpoints that return collections can be paginated in the same way through two optional parameters (`limit` and `offset`). The `offset` parameter determines the 0-based index of the first element of the collection to be returned, which defaults to 0. The `limit` parameter sets the maximum number of items from the collection to be returned, which defaults to 10. The maximum allowed limit parameter is 50.  **Note:** API keys issued for evaluation purposes will have limited access to the first 10 search results only. Other non-search endpoints do not apply this constraint.   Every response from a paginated endpoint contains a top-level property called `pagination`, which in turn contains the `offset` and `limit` values used in the API call, as well as the `total` number of items in the collection. For instance:   ``` \"pagination\": {   \"offset\": 0,   \"limit\": 10,   \"total\": 12 } ```   In the example above, an API call with `offset` = 10 and `limit` = 10 would return the 11th and 12th items in the collection, whereas an API call with `offset` = 20 and `limit` = 10 would return a successful response (200 HTTP code) with an empty collection. Calls with invalid `offset`/`limit` parameters, such as negative values, return an error (400 HTTP code).
+ *
+ * OpenAPI spec version: 4.5.6
+ * 
+ * Generated by: https://github.com/swagger-api/swagger-codegen.git
+ * Swagger Codegen version: 2.4.8
+ */
+
+/**
+ * NOTE: This class is auto generated by the swagger code generator program.
+ * https://github.com/swagger-api/swagger-codegen
+ * Do not edit the class manually.
+ */
+
+namespace Swagger\Client\Api;
+
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
+use Swagger\Client\ApiException;
+use Swagger\Client\Configuration;
+use Swagger\Client\HeaderSelector;
+use Swagger\Client\ObjectSerializer;
+
+/**
+ * EssentialsApi Class Doc Comment
+ *
+ * @category Class
+ * @package  Swagger\Client
+ * @author   Swagger Codegen team
+ * @link     https://github.com/swagger-api/swagger-codegen
+ */
+class EssentialsApi
+{
+    /**
+     * @var ClientInterface
+     */
+    protected $client;
+
+    /**
+     * @var Configuration
+     */
+    protected $config;
+
+    /**
+     * @var HeaderSelector
+     */
+    protected $headerSelector;
+
+    /**
+     * @param ClientInterface $client
+     * @param Configuration   $config
+     * @param HeaderSelector  $selector
+     */
+    public function __construct(
+        ClientInterface $client = null,
+        Configuration $config = null,
+        HeaderSelector $selector = null
+    ) {
+        $this->client = $client ?: new Client();
+        $this->config = $config ?: new Configuration();
+        $this->headerSelector = $selector ?: new HeaderSelector();
+    }
+
+    /**
+     * @return Configuration
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdAreasOfActivityFormatGet
+     *
+     * Charity areas of activity
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharityAreasOfActivityResponse
+     */
+    public function charityCountryCodeCharityIdAreasOfActivityFormatGet($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->charityCountryCodeCharityIdAreasOfActivityFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdAreasOfActivityFormatGetWithHttpInfo
+     *
+     * Charity areas of activity
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharityAreasOfActivityResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function charityCountryCodeCharityIdAreasOfActivityFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityAreasOfActivityResponse';
+        $request = $this->charityCountryCodeCharityIdAreasOfActivityFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharityAreasOfActivityResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdAreasOfActivityFormatGetAsync
+     *
+     * Charity areas of activity
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdAreasOfActivityFormatGetAsync($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->charityCountryCodeCharityIdAreasOfActivityFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdAreasOfActivityFormatGetAsyncWithHttpInfo
+     *
+     * Charity areas of activity
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdAreasOfActivityFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityAreasOfActivityResponse';
+        $request = $this->charityCountryCodeCharityIdAreasOfActivityFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'charityCountryCodeCharityIdAreasOfActivityFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function charityCountryCodeCharityIdAreasOfActivityFormatGetRequest($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling charityCountryCodeCharityIdAreasOfActivityFormatGet'
+            );
+        }
+        // verify the required parameter 'charity_id' is set
+        if ($charity_id === null || (is_array($charity_id) && count($charity_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $charity_id when calling charityCountryCodeCharityIdAreasOfActivityFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling charityCountryCodeCharityIdAreasOfActivityFormatGet'
+            );
+        }
+
+        $resourcePath = '/charity/{countryCode}/{charityId}/areas-of-activity.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($charity_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'charityId' . '}',
+                ObjectSerializer::toPathValue($charity_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdClassifiersFormatGet
+     *
+     * Charity classifiers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of charity  classifier types to include.  - purpose: What the charity does. - activity: How the charity operates - beneficiary: Who the charity helps (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharityClassifiersResponse
+     */
+    public function charityCountryCodeCharityIdClassifiersFormatGet($country_code, $charity_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        list($response) = $this->charityCountryCodeCharityIdClassifiersFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset, $limit, $types);
+        return $response;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdClassifiersFormatGetWithHttpInfo
+     *
+     * Charity classifiers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of charity  classifier types to include.  - purpose: What the charity does. - activity: How the charity operates - beneficiary: Who the charity helps (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharityClassifiersResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function charityCountryCodeCharityIdClassifiersFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        $returnType = '\Swagger\Client\Model\CharityClassifiersResponse';
+        $request = $this->charityCountryCodeCharityIdClassifiersFormatGetRequest($country_code, $charity_id, $format, $offset, $limit, $types);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharityClassifiersResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdClassifiersFormatGetAsync
+     *
+     * Charity classifiers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of charity  classifier types to include.  - purpose: What the charity does. - activity: How the charity operates - beneficiary: Who the charity helps (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdClassifiersFormatGetAsync($country_code, $charity_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        return $this->charityCountryCodeCharityIdClassifiersFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset, $limit, $types)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdClassifiersFormatGetAsyncWithHttpInfo
+     *
+     * Charity classifiers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of charity  classifier types to include.  - purpose: What the charity does. - activity: How the charity operates - beneficiary: Who the charity helps (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdClassifiersFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        $returnType = '\Swagger\Client\Model\CharityClassifiersResponse';
+        $request = $this->charityCountryCodeCharityIdClassifiersFormatGetRequest($country_code, $charity_id, $format, $offset, $limit, $types);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'charityCountryCodeCharityIdClassifiersFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of charity  classifier types to include.  - purpose: What the charity does. - activity: How the charity operates - beneficiary: Who the charity helps (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function charityCountryCodeCharityIdClassifiersFormatGetRequest($country_code, $charity_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling charityCountryCodeCharityIdClassifiersFormatGet'
+            );
+        }
+        // verify the required parameter 'charity_id' is set
+        if ($charity_id === null || (is_array($charity_id) && count($charity_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $charity_id when calling charityCountryCodeCharityIdClassifiersFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling charityCountryCodeCharityIdClassifiersFormatGet'
+            );
+        }
+
+        $resourcePath = '/charity/{countryCode}/{charityId}/classifiers.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+        // query params
+        if (is_array($types)) {
+            $types = ObjectSerializer::serializeCollection($types, 'csv', true);
+        }
+        if ($types !== null) {
+            $queryParams['types'] = ObjectSerializer::toQueryValue($types);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($charity_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'charityId' . '}',
+                ObjectSerializer::toPathValue($charity_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdFormatGet
+     *
+     * Charity vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharityResponse
+     */
+    public function charityCountryCodeCharityIdFormatGet($country_code, $charity_id, $format)
+    {
+        list($response) = $this->charityCountryCodeCharityIdFormatGetWithHttpInfo($country_code, $charity_id, $format);
+        return $response;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdFormatGetWithHttpInfo
+     *
+     * Charity vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharityResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function charityCountryCodeCharityIdFormatGetWithHttpInfo($country_code, $charity_id, $format)
+    {
+        $returnType = '\Swagger\Client\Model\CharityResponse';
+        $request = $this->charityCountryCodeCharityIdFormatGetRequest($country_code, $charity_id, $format);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharityResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdFormatGetAsync
+     *
+     * Charity vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdFormatGetAsync($country_code, $charity_id, $format)
+    {
+        return $this->charityCountryCodeCharityIdFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdFormatGetAsyncWithHttpInfo
+     *
+     * Charity vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format)
+    {
+        $returnType = '\Swagger\Client\Model\CharityResponse';
+        $request = $this->charityCountryCodeCharityIdFormatGetRequest($country_code, $charity_id, $format);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'charityCountryCodeCharityIdFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function charityCountryCodeCharityIdFormatGetRequest($country_code, $charity_id, $format)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling charityCountryCodeCharityIdFormatGet'
+            );
+        }
+        // verify the required parameter 'charity_id' is set
+        if ($charity_id === null || (is_array($charity_id) && count($charity_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $charity_id when calling charityCountryCodeCharityIdFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling charityCountryCodeCharityIdFormatGet'
+            );
+        }
+
+        $resourcePath = '/charity/{countryCode}/{charityId}.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($charity_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'charityId' . '}',
+                ObjectSerializer::toPathValue($charity_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdRegisteredNamesFormatGet
+     *
+     * Charity registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharityRegisteredNamesResponse
+     */
+    public function charityCountryCodeCharityIdRegisteredNamesFormatGet($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->charityCountryCodeCharityIdRegisteredNamesFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdRegisteredNamesFormatGetWithHttpInfo
+     *
+     * Charity registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharityRegisteredNamesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function charityCountryCodeCharityIdRegisteredNamesFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityRegisteredNamesResponse';
+        $request = $this->charityCountryCodeCharityIdRegisteredNamesFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharityRegisteredNamesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdRegisteredNamesFormatGetAsync
+     *
+     * Charity registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdRegisteredNamesFormatGetAsync($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->charityCountryCodeCharityIdRegisteredNamesFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdRegisteredNamesFormatGetAsyncWithHttpInfo
+     *
+     * Charity registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdRegisteredNamesFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityRegisteredNamesResponse';
+        $request = $this->charityCountryCodeCharityIdRegisteredNamesFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'charityCountryCodeCharityIdRegisteredNamesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function charityCountryCodeCharityIdRegisteredNamesFormatGetRequest($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling charityCountryCodeCharityIdRegisteredNamesFormatGet'
+            );
+        }
+        // verify the required parameter 'charity_id' is set
+        if ($charity_id === null || (is_array($charity_id) && count($charity_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $charity_id when calling charityCountryCodeCharityIdRegisteredNamesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling charityCountryCodeCharityIdRegisteredNamesFormatGet'
+            );
+        }
+
+        $resourcePath = '/charity/{countryCode}/{charityId}/registered-names.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($charity_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'charityId' . '}',
+                ObjectSerializer::toPathValue($charity_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdStatusHistoryFormatGet
+     *
+     * Charity status history
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharityStatusesResponse
+     */
+    public function charityCountryCodeCharityIdStatusHistoryFormatGet($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->charityCountryCodeCharityIdStatusHistoryFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdStatusHistoryFormatGetWithHttpInfo
+     *
+     * Charity status history
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharityStatusesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function charityCountryCodeCharityIdStatusHistoryFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityStatusesResponse';
+        $request = $this->charityCountryCodeCharityIdStatusHistoryFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharityStatusesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdStatusHistoryFormatGetAsync
+     *
+     * Charity status history
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdStatusHistoryFormatGetAsync($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->charityCountryCodeCharityIdStatusHistoryFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdStatusHistoryFormatGetAsyncWithHttpInfo
+     *
+     * Charity status history
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdStatusHistoryFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityStatusesResponse';
+        $request = $this->charityCountryCodeCharityIdStatusHistoryFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'charityCountryCodeCharityIdStatusHistoryFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function charityCountryCodeCharityIdStatusHistoryFormatGetRequest($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling charityCountryCodeCharityIdStatusHistoryFormatGet'
+            );
+        }
+        // verify the required parameter 'charity_id' is set
+        if ($charity_id === null || (is_array($charity_id) && count($charity_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $charity_id when calling charityCountryCodeCharityIdStatusHistoryFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling charityCountryCodeCharityIdStatusHistoryFormatGet'
+            );
+        }
+
+        $resourcePath = '/charity/{countryCode}/{charityId}/status-history.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($charity_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'charityId' . '}',
+                ObjectSerializer::toPathValue($charity_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdTrusteesFormatGet
+     *
+     * Charity trustees
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CharityTrusteesResponse
+     */
+    public function charityCountryCodeCharityIdTrusteesFormatGet($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->charityCountryCodeCharityIdTrusteesFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdTrusteesFormatGetWithHttpInfo
+     *
+     * Charity trustees
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CharityTrusteesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function charityCountryCodeCharityIdTrusteesFormatGetWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityTrusteesResponse';
+        $request = $this->charityCountryCodeCharityIdTrusteesFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CharityTrusteesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdTrusteesFormatGetAsync
+     *
+     * Charity trustees
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdTrusteesFormatGetAsync($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->charityCountryCodeCharityIdTrusteesFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation charityCountryCodeCharityIdTrusteesFormatGetAsyncWithHttpInfo
+     *
+     * Charity trustees
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function charityCountryCodeCharityIdTrusteesFormatGetAsyncWithHttpInfo($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CharityTrusteesResponse';
+        $request = $this->charityCountryCodeCharityIdTrusteesFormatGetRequest($country_code, $charity_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'charityCountryCodeCharityIdTrusteesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $charity_id Charity registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function charityCountryCodeCharityIdTrusteesFormatGetRequest($country_code, $charity_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling charityCountryCodeCharityIdTrusteesFormatGet'
+            );
+        }
+        // verify the required parameter 'charity_id' is set
+        if ($charity_id === null || (is_array($charity_id) && count($charity_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $charity_id when calling charityCountryCodeCharityIdTrusteesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling charityCountryCodeCharityIdTrusteesFormatGet'
+            );
+        }
+
+        $resourcePath = '/charity/{countryCode}/{charityId}/trustees.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($charity_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'charityId' . '}',
+                ObjectSerializer::toPathValue($charity_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdAddressesFormatGet
+     *
+     * Company addresses
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyAddressesResponse
+     */
+    public function companyCountryCodeCompanyIdAddressesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdAddressesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdAddressesFormatGetWithHttpInfo
+     *
+     * Company addresses
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyAddressesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdAddressesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyAddressesResponse';
+        $request = $this->companyCountryCodeCompanyIdAddressesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyAddressesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdAddressesFormatGetAsync
+     *
+     * Company addresses
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdAddressesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdAddressesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdAddressesFormatGetAsyncWithHttpInfo
+     *
+     * Company addresses
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdAddressesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyAddressesResponse';
+        $request = $this->companyCountryCodeCompanyIdAddressesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdAddressesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdAddressesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdAddressesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdAddressesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdAddressesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/addresses.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdCharitableIdentitiesFormatGet
+     *
+     * Company charitable identities
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyCharitableIdentitiesResponse
+     */
+    public function companyCountryCodeCompanyIdCharitableIdentitiesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdCharitableIdentitiesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdCharitableIdentitiesFormatGetWithHttpInfo
+     *
+     * Company charitable identities
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyCharitableIdentitiesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdCharitableIdentitiesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyCharitableIdentitiesResponse';
+        $request = $this->companyCountryCodeCompanyIdCharitableIdentitiesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyCharitableIdentitiesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdCharitableIdentitiesFormatGetAsync
+     *
+     * Company charitable identities
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdCharitableIdentitiesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdCharitableIdentitiesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdCharitableIdentitiesFormatGetAsyncWithHttpInfo
+     *
+     * Company charitable identities
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdCharitableIdentitiesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyCharitableIdentitiesResponse';
+        $request = $this->companyCountryCodeCompanyIdCharitableIdentitiesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdCharitableIdentitiesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdCharitableIdentitiesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdCharitableIdentitiesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdCharitableIdentitiesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdCharitableIdentitiesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/charitable-identities.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdDescriptionsFormatGet
+     *
+     * Company descriptions
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyDescriptionsResponse
+     */
+    public function companyCountryCodeCompanyIdDescriptionsFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdDescriptionsFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdDescriptionsFormatGetWithHttpInfo
+     *
+     * Company descriptions
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyDescriptionsResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdDescriptionsFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyDescriptionsResponse';
+        $request = $this->companyCountryCodeCompanyIdDescriptionsFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyDescriptionsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdDescriptionsFormatGetAsync
+     *
+     * Company descriptions
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdDescriptionsFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdDescriptionsFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdDescriptionsFormatGetAsyncWithHttpInfo
+     *
+     * Company descriptions
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdDescriptionsFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyDescriptionsResponse';
+        $request = $this->companyCountryCodeCompanyIdDescriptionsFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdDescriptionsFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdDescriptionsFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdDescriptionsFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdDescriptionsFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdDescriptionsFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/descriptions.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdFormatGet
+     *
+     * Company vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyResponse
+     */
+    public function companyCountryCodeCompanyIdFormatGet($country_code, $company_id, $format)
+    {
+        list($response) = $this->companyCountryCodeCompanyIdFormatGetWithHttpInfo($country_code, $company_id, $format);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdFormatGetWithHttpInfo
+     *
+     * Company vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdFormatGetWithHttpInfo($country_code, $company_id, $format)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyResponse';
+        $request = $this->companyCountryCodeCompanyIdFormatGetRequest($country_code, $company_id, $format);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdFormatGetAsync
+     *
+     * Company vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdFormatGetAsync($country_code, $company_id, $format)
+    {
+        return $this->companyCountryCodeCompanyIdFormatGetAsyncWithHttpInfo($country_code, $company_id, $format)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdFormatGetAsyncWithHttpInfo
+     *
+     * Company vitals
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdFormatGetAsyncWithHttpInfo($country_code, $company_id, $format)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyResponse';
+        $request = $this->companyCountryCodeCompanyIdFormatGetRequest($country_code, $company_id, $format);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdFormatGetRequest($country_code, $company_id, $format)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdHmrcImportsExportsFormatGet
+     *
+     * Company HMRC imports and exports
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $trade_directions List of trade directions (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyHMRCImportsExportsResponse
+     */
+    public function companyCountryCodeCompanyIdHmrcImportsExportsFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10', $trade_directions = null)
+    {
+        list($response) = $this->companyCountryCodeCompanyIdHmrcImportsExportsFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $trade_directions);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdHmrcImportsExportsFormatGetWithHttpInfo
+     *
+     * Company HMRC imports and exports
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $trade_directions List of trade directions (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyHMRCImportsExportsResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdHmrcImportsExportsFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $trade_directions = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyHMRCImportsExportsResponse';
+        $request = $this->companyCountryCodeCompanyIdHmrcImportsExportsFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $trade_directions);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyHMRCImportsExportsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdHmrcImportsExportsFormatGetAsync
+     *
+     * Company HMRC imports and exports
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $trade_directions List of trade directions (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdHmrcImportsExportsFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10', $trade_directions = null)
+    {
+        return $this->companyCountryCodeCompanyIdHmrcImportsExportsFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $trade_directions)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdHmrcImportsExportsFormatGetAsyncWithHttpInfo
+     *
+     * Company HMRC imports and exports
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $trade_directions List of trade directions (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdHmrcImportsExportsFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $trade_directions = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyHMRCImportsExportsResponse';
+        $request = $this->companyCountryCodeCompanyIdHmrcImportsExportsFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $trade_directions);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdHmrcImportsExportsFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $trade_directions List of trade directions (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdHmrcImportsExportsFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10', $trade_directions = null)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdHmrcImportsExportsFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdHmrcImportsExportsFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdHmrcImportsExportsFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/hmrc-imports-exports.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+        // query params
+        if (is_array($trade_directions)) {
+            $trade_directions = ObjectSerializer::serializeCollection($trade_directions, 'csv', true);
+        }
+        if ($trade_directions !== null) {
+            $queryParams['tradeDirections'] = ObjectSerializer::toQueryValue($trade_directions);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdIndustriesFormatGet
+     *
+     * Company industries
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of industry classification systems to include if available (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyIndustriesResponse
+     */
+    public function companyCountryCodeCompanyIdIndustriesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        list($response) = $this->companyCountryCodeCompanyIdIndustriesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $types);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdIndustriesFormatGetWithHttpInfo
+     *
+     * Company industries
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of industry classification systems to include if available (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyIndustriesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdIndustriesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyIndustriesResponse';
+        $request = $this->companyCountryCodeCompanyIdIndustriesFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $types);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyIndustriesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdIndustriesFormatGetAsync
+     *
+     * Company industries
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of industry classification systems to include if available (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdIndustriesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        return $this->companyCountryCodeCompanyIdIndustriesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $types)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdIndustriesFormatGetAsyncWithHttpInfo
+     *
+     * Company industries
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of industry classification systems to include if available (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdIndustriesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyIndustriesResponse';
+        $request = $this->companyCountryCodeCompanyIdIndustriesFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $types);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdIndustriesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $types List of industry classification systems to include if available (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdIndustriesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10', $types = null)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdIndustriesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdIndustriesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdIndustriesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/industries.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+        // query params
+        if (is_array($types)) {
+            $types = ObjectSerializer::serializeCollection($types, 'csv', true);
+        }
+        if ($types !== null) {
+            $queryParams['types'] = ObjectSerializer::toQueryValue($types);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdKeywordsFormatGet
+     *
+     * Company keywords
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyKeywordsResponse
+     */
+    public function companyCountryCodeCompanyIdKeywordsFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdKeywordsFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdKeywordsFormatGetWithHttpInfo
+     *
+     * Company keywords
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyKeywordsResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdKeywordsFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyKeywordsResponse';
+        $request = $this->companyCountryCodeCompanyIdKeywordsFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyKeywordsResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdKeywordsFormatGetAsync
+     *
+     * Company keywords
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdKeywordsFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdKeywordsFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdKeywordsFormatGetAsyncWithHttpInfo
+     *
+     * Company keywords
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdKeywordsFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyKeywordsResponse';
+        $request = $this->companyCountryCodeCompanyIdKeywordsFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdKeywordsFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdKeywordsFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdKeywordsFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdKeywordsFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdKeywordsFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/keywords.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdOfficersFormatGet
+     *
+     * Company officers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyOfficersResponse
+     */
+    public function companyCountryCodeCompanyIdOfficersFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        list($response) = $this->companyCountryCodeCompanyIdOfficersFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $appointment_statuses);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdOfficersFormatGetWithHttpInfo
+     *
+     * Company officers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyOfficersResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdOfficersFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyOfficersResponse';
+        $request = $this->companyCountryCodeCompanyIdOfficersFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $appointment_statuses);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyOfficersResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdOfficersFormatGetAsync
+     *
+     * Company officers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdOfficersFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        return $this->companyCountryCodeCompanyIdOfficersFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $appointment_statuses)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdOfficersFormatGetAsyncWithHttpInfo
+     *
+     * Company officers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdOfficersFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanyOfficersResponse';
+        $request = $this->companyCountryCodeCompanyIdOfficersFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $appointment_statuses);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdOfficersFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdOfficersFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdOfficersFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdOfficersFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdOfficersFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/officers.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+        // query params
+        if (is_array($appointment_statuses)) {
+            $appointment_statuses = ObjectSerializer::serializeCollection($appointment_statuses, 'csv', true);
+        }
+        if ($appointment_statuses !== null) {
+            $queryParams['appointmentStatuses'] = ObjectSerializer::toQueryValue($appointment_statuses);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRegisteredNamesFormatGet
+     *
+     * Company registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyRegisteredNamesResponse
+     */
+    public function companyCountryCodeCompanyIdRegisteredNamesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdRegisteredNamesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRegisteredNamesFormatGetWithHttpInfo
+     *
+     * Company registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyRegisteredNamesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdRegisteredNamesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyRegisteredNamesResponse';
+        $request = $this->companyCountryCodeCompanyIdRegisteredNamesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyRegisteredNamesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRegisteredNamesFormatGetAsync
+     *
+     * Company registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdRegisteredNamesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdRegisteredNamesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRegisteredNamesFormatGetAsyncWithHttpInfo
+     *
+     * Company registered names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdRegisteredNamesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyRegisteredNamesResponse';
+        $request = $this->companyCountryCodeCompanyIdRegisteredNamesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdRegisteredNamesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdRegisteredNamesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdRegisteredNamesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdRegisteredNamesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdRegisteredNamesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/registered-names.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRelatedNamesFormatGet
+     *
+     * Company related names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyRelatedNamesResponse
+     */
+    public function companyCountryCodeCompanyIdRelatedNamesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdRelatedNamesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRelatedNamesFormatGetWithHttpInfo
+     *
+     * Company related names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyRelatedNamesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdRelatedNamesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyRelatedNamesResponse';
+        $request = $this->companyCountryCodeCompanyIdRelatedNamesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyRelatedNamesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRelatedNamesFormatGetAsync
+     *
+     * Company related names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdRelatedNamesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdRelatedNamesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdRelatedNamesFormatGetAsyncWithHttpInfo
+     *
+     * Company related names
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdRelatedNamesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyRelatedNamesResponse';
+        $request = $this->companyCountryCodeCompanyIdRelatedNamesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdRelatedNamesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdRelatedNamesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdRelatedNamesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdRelatedNamesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdRelatedNamesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/related-names.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdSocialMediaProfilesFormatGet
+     *
+     * Company social media profiles
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $platforms List of platforms to include (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanySocialMediaProfilesResponse
+     */
+    public function companyCountryCodeCompanyIdSocialMediaProfilesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10', $platforms = null)
+    {
+        list($response) = $this->companyCountryCodeCompanyIdSocialMediaProfilesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $platforms);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdSocialMediaProfilesFormatGetWithHttpInfo
+     *
+     * Company social media profiles
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $platforms List of platforms to include (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanySocialMediaProfilesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdSocialMediaProfilesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $platforms = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanySocialMediaProfilesResponse';
+        $request = $this->companyCountryCodeCompanyIdSocialMediaProfilesFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $platforms);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanySocialMediaProfilesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdSocialMediaProfilesFormatGetAsync
+     *
+     * Company social media profiles
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $platforms List of platforms to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdSocialMediaProfilesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10', $platforms = null)
+    {
+        return $this->companyCountryCodeCompanyIdSocialMediaProfilesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit, $platforms)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdSocialMediaProfilesFormatGetAsyncWithHttpInfo
+     *
+     * Company social media profiles
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $platforms List of platforms to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdSocialMediaProfilesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10', $platforms = null)
+    {
+        $returnType = '\Swagger\Client\Model\CompanySocialMediaProfilesResponse';
+        $request = $this->companyCountryCodeCompanyIdSocialMediaProfilesFormatGetRequest($country_code, $company_id, $format, $offset, $limit, $platforms);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdSocialMediaProfilesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $platforms List of platforms to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdSocialMediaProfilesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10', $platforms = null)
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdSocialMediaProfilesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdSocialMediaProfilesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdSocialMediaProfilesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/social-media-profiles.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+        // query params
+        if (is_array($platforms)) {
+            $platforms = ObjectSerializer::serializeCollection($platforms, 'csv', true);
+        }
+        if ($platforms !== null) {
+            $queryParams['platforms'] = ObjectSerializer::toQueryValue($platforms);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdTelephoneNumbersFormatGet
+     *
+     * Company telephone numbers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyTelephoneNumbersResponse
+     */
+    public function companyCountryCodeCompanyIdTelephoneNumbersFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdTelephoneNumbersFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdTelephoneNumbersFormatGetWithHttpInfo
+     *
+     * Company telephone numbers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyTelephoneNumbersResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdTelephoneNumbersFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyTelephoneNumbersResponse';
+        $request = $this->companyCountryCodeCompanyIdTelephoneNumbersFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyTelephoneNumbersResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdTelephoneNumbersFormatGetAsync
+     *
+     * Company telephone numbers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdTelephoneNumbersFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdTelephoneNumbersFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdTelephoneNumbersFormatGetAsyncWithHttpInfo
+     *
+     * Company telephone numbers
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdTelephoneNumbersFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyTelephoneNumbersResponse';
+        $request = $this->companyCountryCodeCompanyIdTelephoneNumbersFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdTelephoneNumbersFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdTelephoneNumbersFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdTelephoneNumbersFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdTelephoneNumbersFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdTelephoneNumbersFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/telephone-numbers.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdWebsitesFormatGet
+     *
+     * Company websites
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\CompanyWebsitesResponse
+     */
+    public function companyCountryCodeCompanyIdWebsitesFormatGet($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        list($response) = $this->companyCountryCodeCompanyIdWebsitesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset, $limit);
+        return $response;
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdWebsitesFormatGetWithHttpInfo
+     *
+     * Company websites
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\CompanyWebsitesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function companyCountryCodeCompanyIdWebsitesFormatGetWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyWebsitesResponse';
+        $request = $this->companyCountryCodeCompanyIdWebsitesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\CompanyWebsitesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdWebsitesFormatGetAsync
+     *
+     * Company websites
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdWebsitesFormatGetAsync($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        return $this->companyCountryCodeCompanyIdWebsitesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset, $limit)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation companyCountryCodeCompanyIdWebsitesFormatGetAsyncWithHttpInfo
+     *
+     * Company websites
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function companyCountryCodeCompanyIdWebsitesFormatGetAsyncWithHttpInfo($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        $returnType = '\Swagger\Client\Model\CompanyWebsitesResponse';
+        $request = $this->companyCountryCodeCompanyIdWebsitesFormatGetRequest($country_code, $company_id, $format, $offset, $limit);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'companyCountryCodeCompanyIdWebsitesFormatGet'
+     *
+     * @param  string $country_code [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in lowercase. (required)
+     * @param  string $company_id Company registration number (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function companyCountryCodeCompanyIdWebsitesFormatGetRequest($country_code, $company_id, $format, $offset = '0', $limit = '10')
+    {
+        // verify the required parameter 'country_code' is set
+        if ($country_code === null || (is_array($country_code) && count($country_code) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $country_code when calling companyCountryCodeCompanyIdWebsitesFormatGet'
+            );
+        }
+        // verify the required parameter 'company_id' is set
+        if ($company_id === null || (is_array($company_id) && count($company_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $company_id when calling companyCountryCodeCompanyIdWebsitesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling companyCountryCodeCompanyIdWebsitesFormatGet'
+            );
+        }
+
+        $resourcePath = '/company/{countryCode}/{companyId}/websites.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+
+        // path params
+        if ($country_code !== null) {
+            $resourcePath = str_replace(
+                '{' . 'countryCode' . '}',
+                ObjectSerializer::toPathValue($country_code),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($company_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'companyId' . '}',
+                ObjectSerializer::toPathValue($company_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation officerOfficerIdCompaniesFormatGet
+     *
+     * Officer appointments
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\OfficerCompaniesResponse
+     */
+    public function officerOfficerIdCompaniesFormatGet($officer_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        list($response) = $this->officerOfficerIdCompaniesFormatGetWithHttpInfo($officer_id, $format, $offset, $limit, $appointment_statuses);
+        return $response;
+    }
+
+    /**
+     * Operation officerOfficerIdCompaniesFormatGetWithHttpInfo
+     *
+     * Officer appointments
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\OfficerCompaniesResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function officerOfficerIdCompaniesFormatGetWithHttpInfo($officer_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        $returnType = '\Swagger\Client\Model\OfficerCompaniesResponse';
+        $request = $this->officerOfficerIdCompaniesFormatGetRequest($officer_id, $format, $offset, $limit, $appointment_statuses);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\OfficerCompaniesResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation officerOfficerIdCompaniesFormatGetAsync
+     *
+     * Officer appointments
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function officerOfficerIdCompaniesFormatGetAsync($officer_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        return $this->officerOfficerIdCompaniesFormatGetAsyncWithHttpInfo($officer_id, $format, $offset, $limit, $appointment_statuses)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation officerOfficerIdCompaniesFormatGetAsyncWithHttpInfo
+     *
+     * Officer appointments
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function officerOfficerIdCompaniesFormatGetAsyncWithHttpInfo($officer_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        $returnType = '\Swagger\Client\Model\OfficerCompaniesResponse';
+        $request = $this->officerOfficerIdCompaniesFormatGetRequest($officer_id, $format, $offset, $limit, $appointment_statuses);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'officerOfficerIdCompaniesFormatGet'
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     * @param  int $offset Determines the 0-based index of the first element of the collection to be returned (optional, default to 0)
+     * @param  int $limit Configures the maximum number of items from the collection to be returned in the given API call (optional, default to 10)
+     * @param  string[] $appointment_statuses List of appointment statuses to include (optional)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function officerOfficerIdCompaniesFormatGetRequest($officer_id, $format, $offset = '0', $limit = '10', $appointment_statuses = null)
+    {
+        // verify the required parameter 'officer_id' is set
+        if ($officer_id === null || (is_array($officer_id) && count($officer_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $officer_id when calling officerOfficerIdCompaniesFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling officerOfficerIdCompaniesFormatGet'
+            );
+        }
+
+        $resourcePath = '/officer/{officerId}/companies.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        if ($offset !== null) {
+            $queryParams['offset'] = ObjectSerializer::toQueryValue($offset);
+        }
+        // query params
+        if ($limit !== null) {
+            $queryParams['limit'] = ObjectSerializer::toQueryValue($limit);
+        }
+        // query params
+        if (is_array($appointment_statuses)) {
+            $appointment_statuses = ObjectSerializer::serializeCollection($appointment_statuses, 'csv', true);
+        }
+        if ($appointment_statuses !== null) {
+            $queryParams['appointmentStatuses'] = ObjectSerializer::toQueryValue($appointment_statuses);
+        }
+
+        // path params
+        if ($officer_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'officerId' . '}',
+                ObjectSerializer::toPathValue($officer_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation officerOfficerIdFormatGet
+     *
+     * Officer vitals
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return \Swagger\Client\Model\OfficerResponse
+     */
+    public function officerOfficerIdFormatGet($officer_id, $format)
+    {
+        list($response) = $this->officerOfficerIdFormatGetWithHttpInfo($officer_id, $format);
+        return $response;
+    }
+
+    /**
+     * Operation officerOfficerIdFormatGetWithHttpInfo
+     *
+     * Officer vitals
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \Swagger\Client\ApiException on non-2xx response
+     * @throws \InvalidArgumentException
+     * @return array of \Swagger\Client\Model\OfficerResponse, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function officerOfficerIdFormatGetWithHttpInfo($officer_id, $format)
+    {
+        $returnType = '\Swagger\Client\Model\OfficerResponse';
+        $request = $this->officerOfficerIdFormatGetRequest($officer_id, $format);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    $response->getBody()
+                );
+            }
+
+            $responseBody = $response->getBody();
+            if ($returnType === '\SplFileObject') {
+                $content = $responseBody; //stream goes to serializer
+            } else {
+                $content = $responseBody->getContents();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\OfficerResponse',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                default:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Swagger\Client\Model\Error',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation officerOfficerIdFormatGetAsync
+     *
+     * Officer vitals
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function officerOfficerIdFormatGetAsync($officer_id, $format)
+    {
+        return $this->officerOfficerIdFormatGetAsyncWithHttpInfo($officer_id, $format)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation officerOfficerIdFormatGetAsyncWithHttpInfo
+     *
+     * Officer vitals
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function officerOfficerIdFormatGetAsyncWithHttpInfo($officer_id, $format)
+    {
+        $returnType = '\Swagger\Client\Model\OfficerResponse';
+        $request = $this->officerOfficerIdFormatGetRequest($officer_id, $format);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    $responseBody = $response->getBody();
+                    if ($returnType === '\SplFileObject') {
+                        $content = $responseBody; //stream goes to serializer
+                    } else {
+                        $content = $responseBody->getContents();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'officerOfficerIdFormatGet'
+     *
+     * @param  string $officer_id Officer id (required)
+     * @param  string $format Response format. Currently, only supported option is json. (required)
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    protected function officerOfficerIdFormatGetRequest($officer_id, $format)
+    {
+        // verify the required parameter 'officer_id' is set
+        if ($officer_id === null || (is_array($officer_id) && count($officer_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $officer_id when calling officerOfficerIdFormatGet'
+            );
+        }
+        // verify the required parameter 'format' is set
+        if ($format === null || (is_array($format) && count($format) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $format when calling officerOfficerIdFormatGet'
+            );
+        }
+
+        $resourcePath = '/officer/{officerId}.{format}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // path params
+        if ($officer_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'officerId' . '}',
+                ObjectSerializer::toPathValue($officer_id),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($format !== null) {
+            $resourcePath = str_replace(
+                '{' . 'format' . '}',
+                ObjectSerializer::toPathValue($format),
+                $resourcePath
+            );
+        }
+
+        // body params
+        $_tempBody = null;
+
+        if ($multipart) {
+            $headers = $this->headerSelector->selectHeadersForMultipart(
+                []
+            );
+        } else {
+            $headers = $this->headerSelector->selectHeaders(
+                [],
+                []
+            );
+        }
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            // $_tempBody is the method argument, if present
+            $httpBody = $_tempBody;
+            // \stdClass has no __toString(), so we should encode it manually
+            if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($httpBody);
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $multipartContents[] = [
+                        'name' => $formParamName,
+                        'contents' => $formParamValue
+                    ];
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif ($headers['Content-Type'] === 'application/json') {
+                $httpBody = \GuzzleHttp\json_encode($formParams);
+
+            } else {
+                // for HTTP post (form)
+                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+            }
+        }
+
+        // this endpoint requires API key authentication
+        $apiKey = $this->config->getApiKeyWithPrefix('X-AUTH-TOKEN');
+        if ($apiKey !== null) {
+            $headers['X-AUTH-TOKEN'] = $apiKey;
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        return new Request(
+            'GET',
+            $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Create http client option
+     *
+     * @throws \RuntimeException on file opening failure
+     * @return array of http client options
+     */
+    protected function createHttpClientOption()
+    {
+        $options = [];
+        if ($this->config->getDebug()) {
+            $options[RequestOptions::DEBUG] = fopen($this->config->getDebugFile(), 'a');
+            if (!$options[RequestOptions::DEBUG]) {
+                throw new \RuntimeException('Failed to open the debug file: ' . $this->config->getDebugFile());
+            }
+        }
+
+        return $options;
+    }
+}
